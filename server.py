@@ -51,9 +51,13 @@ class Server:
                             # )
                             
                             # print('guessed number: {}, parsed_msg: {}' .format(self.guessed_number, self.parsed_msg[1]))
-                            if self.parsed_msg[1] == self.guessed_number:
+                            # print(self.parsed_msg[0] == '=')
+                            if self.parsed_msg[1] == self.guessed_number and self.parsed_msg[0].decode() == '=':
                                 self.is_number_guessed = True
                                 self.sendMessageToClient(0, 'Y', s, packer)
+                                self.inputs.remove(s)
+                            elif self.parsed_msg[1] != self.guessed_number and self.parsed_msg[0].decode() == '=':
+                                self.sendMessageToClient(0, 'K', s, packer)
                             elif (self.parsed_msg[1] > self.guessed_number and self.parsed_msg[0].decode() == '<') or (self.parsed_msg[1] < self.guessed_number and self.parsed_msg[0].decode() == '>'):
                                 self.sendMessageToClient(0, 'I', s, packer)
                             elif (self.parsed_msg[1] < self.guessed_number and self.parsed_msg[0].decode() == '<') or (self.parsed_msg[1] > self.guessed_number and self.parsed_msg[0].decode() == '>'):
@@ -64,6 +68,7 @@ class Server:
                         if s is not self.sock:
                             self.sendMessageToClient(0, 'V', s, packer)
                             s.close()
+                            self.inputs.remove(s)
 
                     break
 

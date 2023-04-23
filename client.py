@@ -49,11 +49,12 @@ class Client:
                 self.sendMessage(self.number_to_guess, packer)
                 self.recieveMessage(packer)
 
+        return
         # print('kliens vege!')
 
     # helper fuggveny, hogy ne legyen kodismetlen uzenet kuldesnel
     def sendMessage (self, number_to_guess, packer):
-        self.equ = self.equality[random.randint(0, len(self.equality) - 2)]
+        self.equ = self.equality[random.randint(0, len(self.equality) - 1)]
         if self.max == self.min:
             self.equ = '='
         self.msg = packer.pack(self.equ.encode(), number_to_guess)
