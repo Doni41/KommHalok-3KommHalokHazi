@@ -20,50 +20,50 @@ class Client:
 
     # clientLogic fuggveny, ami a talalgatast csinalja a barkobabol
     def clientLogic(self):
-        print(self.number_to_guess)
-        print ('initial guess: min: {} max: {} guessed: {}'.format(self.min, self.max, self.number_to_guess))
+        # print ('initial guess: min: {} max: {} guessed: {}'.format(self.min, self.max, self.number_to_guess))
         packer = struct.Struct("c i")
-        equ = self.equality[random.randint(0, len(self.equality) - 2)]
+        self.equ = self.equality[random.randint(0, len(self.equality) - 2)]
 
-        self.msg = packer.pack(equ.encode(), self.number_to_guess)
+        self.msg = packer.pack(self.equ.encode(), self.number_to_guess)
         self.sock.sendall(self.msg)
 
         self.msg = self.sock.recv(packer.size)
         self.pasrsed_msg = packer.unpack(self.msg)
+        # print(self.pasrsed_msg)
 
-        while self.pasrsed_msg[0].decode() != 'K' or self.pasrsed_msg[0].decode() != 'Y' or self.pasrsed_msg[0].decode() != 'V':
-            if (self.pasrsed_msg[0].decode() == 'I' and equ == '<') or (self.pasrsed_msg[0].decode() == 'N' and equ == '>'):
+        while self.pasrsed_msg[0].decode() != 'K' and self.pasrsed_msg[0].decode() != 'Y' and self.pasrsed_msg[0].decode() != 'V':
+            if (self.pasrsed_msg[0].decode() == 'I' and self.equ == '<') or (self.pasrsed_msg[0].decode() == 'N' and self.equ == '>'):
                 self.max = self.number_to_guess
                 self.number_to_guess = random.randint(self.min, self.max)
-                print ('min: {} max: {} guessed: {}'.format(self.min, self.max, self.number_to_guess))
+                # print ('min: {} max: {} guessed: {}'.format(self.min, self.max, self.number_to_guess))
 
                 time.sleep(random.randint(1,5))
-                self.sendMessage(self.number_to_guess, equ, packer)
+                self.sendMessage(self.number_to_guess, packer)
                 self.recieveMessage(packer)
-
-            elif self.pasrsed_msg[0].decode() == 'I' and equ == '>' or (self.pasrsed_msg[0].decode() == 'N' and equ == '<'):
+            elif (self.pasrsed_msg[0].decode() == 'I' and self.equ == '>') or (self.pasrsed_msg[0].decode() == 'N' and self.equ == '<'):
                 self.min = self.number_to_guess
                 self.number_to_guess = random.randint(self.min, self.max)
-                print ('min: {} max: {} guessed: {}'.format(self.min, self.max, self.number_to_guess))
+                # print ('min: {} max: {} guessed: {}'.format(self.min, self.max, self.number_to_guess))
 
                 time.sleep(random.randint(1,5))
-                self.sendMessage(self.number_to_guess, equ, packer)
+                self.sendMessage(self.number_to_guess, packer)
                 self.recieveMessage(packer)
 
-        print('kliens vege!')
+        # print('kliens vege!')
 
     # helper fuggveny, hogy ne legyen kodismetlen uzenet kuldesnel
-    def sendMessage (self, number_to_guess, equ, packer):
-        equ = self.equality[random.randint(0, len(self.equality) - 2)]
+    def sendMessage (self, number_to_guess, packer):
+        self.equ = self.equality[random.randint(0, len(self.equality) - 2)]
         if self.max == self.min:
-            equ = '='
-        self.msg = packer.pack(equ.encode(), number_to_guess)
+            self.equ = '='
+        self.msg = packer.pack(self.equ.encode(), number_to_guess)
         self.sock.sendall(self.msg)
 
     # helper fuggveny, hogy ne legyen kodismetlen uzenet fogadasnal
     def recieveMessage(self, packer):
         self.msg = self.sock.recv(packer.size)
         self.pasrsed_msg = packer.unpack(self.msg)
+        # print(self.pasrsed_msg)
 
     # osztaly valtozoinak inicializalasa
     def initVariables(self):
@@ -73,6 +73,7 @@ class Client:
         self.msg = ''
         self.pasrsed_msg = []
         self.equality = ["<", ">", "="]
+        self.equ = self.equality[random.randint(0, len(self.equality) - 2)]
 
 
         

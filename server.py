@@ -33,35 +33,37 @@ class Server:
                     for s in readables:
                         if s is self.sock:
                             connection, client_info = self.sock.accept()
-                            print("Csatlakozott valaki: {}:{}".format(*client_info))
+                            # print("Csatlakozott valaki: {}:{}".format(*client_info))
                             self.inputs.append(connection)
                         else:
                             self.msg = s.recv(packer.size)
                             if not self.msg:
                                 s.close()
-                                print("A kliens lezarta a kapcsolatot")
+                                # print("A kliens lezarta a kapcsolatot")
                                 self.inputs.remove(s)
                                 continue
     
                             self.parsed_msg = packer.unpack(self.msg)
-                            print(
-                                "A kliens msg: {} {}".format(
-                                    self.parsed_msg[0].decode(), self.parsed_msg[1]
-                                )
-                            )
-
+                            # print(
+                            #     "A kliens msg: {} {}".format(
+                            #         self.parsed_msg[0].decode(), self.parsed_msg[1]
+                            #     )
+                            # )
+                            
+                            # print('guessed number: {}, parsed_msg: {}' .format(self.guessed_number, self.parsed_msg[1]))
                             if self.parsed_msg[1] == self.guessed_number:
                                 self.is_number_guessed = True
                                 self.sendMessageToClient(0, 'Y', s, packer)
-                            elif (self.parsed_msg[1] < self.guessed_number and self.parsed_msg[0].decode() == '<') or (self.parsed_msg[1] > self.guessed_number and self.parsed_msg[0].decode() == '>'):
-                                self.sendMessageToClient(0, 'I', s, packer)
                             elif (self.parsed_msg[1] > self.guessed_number and self.parsed_msg[0].decode() == '<') or (self.parsed_msg[1] < self.guessed_number and self.parsed_msg[0].decode() == '>'):
+                                self.sendMessageToClient(0, 'I', s, packer)
+                            elif (self.parsed_msg[1] < self.guessed_number and self.parsed_msg[0].decode() == '<') or (self.parsed_msg[1] > self.guessed_number and self.parsed_msg[0].decode() == '>'):
                                 self.sendMessageToClient(0, 'N', s, packer)
 
                 else:
                     for s in self.inputs:
-                        self.sendMessageToClient(0, 'V', s, packer)
-                        s.close()
+                        if s is not self.sock:
+                            self.sendMessageToClient(0, 'V', s, packer)
+                            s.close()
 
                     break
 
@@ -72,13 +74,12 @@ class Server:
             except KeyboardInterrupt:
                 for s in self.inputs:
                     s.close()
-                print("Server closing")
+                # print("Server closing")
                 break
 
     def sendMessageToClient(self, number, char, s, packer):
         self.msg = packer.pack(char.encode(), number)
         s.sendall(self.msg)
-        # s.close()
 
     # osztaly valtozoinak inicializalasa
     def initVariables(self):
